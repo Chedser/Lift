@@ -114,7 +114,7 @@ def auth_h():
 
 @app.route('/logs')
 def logs():
-    if request.cookies.get('user') != "admin": #Защита
+    if request.cookies.get('user').lower() != "admin": #Защита
         return "Неизвестная ошибка"
 
     with sqlite3.connect('database.db') as con:
@@ -132,7 +132,7 @@ def logs():
 
 @app.route('/users')
 def users():
-    if request.cookies.get('user') != "admin": #Защита
+    if request.cookies.get('user').lower() != "admin": #Защита
         return "Неизвестная ошибка"
 
     with sqlite3.connect('database.db') as con:

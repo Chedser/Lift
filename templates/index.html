@@ -174,7 +174,7 @@ function getState(state){
 			<a id = "unloginA" style="text-decoration:underline;cursor:pointer;">Разлогиниться</a></div>
 		<div class="w3-display-topright">
     
-		{% if login == "admin" %} 
+		{% if login == "admin" or login == "Admin" %}
 			<a id = "usersA" href = "/users" style = "text-align:left" target = "_blank">Пользователи</a>
 			<a id = "logsA" href = "/logs" style = "text-align:right" target = "_blank">Логи</a>
 		{% endif %}
