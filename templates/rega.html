@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Рега</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="{{ url_for('static', filename= 'css/w3.css') }}" />
+<link rel="stylesheet" href="{{ url_for('static', filename= 'css/fonts/fonts.css') }}" />
+<script src="{{ url_for('static', filename= 'js/jquery.js') }}"></script>
+<script src="{{ url_for('static', filename= 'js/rega.js') }}"></script>
+<style>
+body,h1,h2,h3,h4,h5,h6 {font-family: "Karma", sans-serif}
+.w3-bar-block .w3-bar-item {padding:20px}
+
+#send_btn{
+	display:inline-block;
+
+}
+</style>
+</head>
+<body>
+  
+<!-- !PAGE CONTENT! -->
+<div class="w3-main w3-content w3-padding" style="max-width:1200px;margin-top:100px">
+
+<a href="javascript:window.location.replace('/auth')">Авторизация</a>
+
+<div class="w3-row">
+  <div class="w3-col w3-container" style="width:30%"></div>
+  <div class="w3-col w3-container" style="width:40%">
+  
+		<!-- Form-->
+	  <div class="w3-row w3-center w3-padding w3-margin w3-border w3-border-blue w3-round-xlarge">
+								<h3>Регистрация</h3>
+		<input class="w3-input" type="text" placeholder="Логин" id="login" maxlength="30" required />
+		<input class="w3-input" type="password" placeholder="Пароль" id="pass" maxlength="30" required />
+		<input class="w3-input" type="password" placeholder="Пароль повтор" id="pass_repeat" maxlength="30" required />
+		
+	</div>
+  
+  </div>
+  <div class="w3-col w3-container" style="width:30%"></div>
+</div>
+	
+	<div class = "w3-container" style="text-align:center">
+	
+		<button class="w3-btn w3-green w3-hover-blue w3-round" id = "send_btn" >OK</button>
+	
+	</div>
+	
+	<hr />
+	
+	<div id = "infoBlock"></div>
+			
+	</div>
+    
+ </div>
+
+<!-- End page content -->
+</div>
+
+<script>
+
+</script>
+
+</body>
+</html>

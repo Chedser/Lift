@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Лифт</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="stylesheet" href="{{ url_for('static', filename= 'css/w3.css') }}" />
+<link rel="stylesheet" href="{{ url_for('static', filename= 'css/fonts/fonts.css') }}" />
+<script src="{{ url_for('static', filename= 'js/jquery.js') }}"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA=" crossorigin="anonymous"></script>
+
+<style>
+body,h1,h2,h3,h4,h5,h6 {font-family: "Karma", sans-serif}
+.w3-bar-block .w3-bar-item {padding:20px}
+</style>
+
+<script>
+
+$(document).ready(function(){
+  var floor_dest = 6; // Начальная точка для лифта
+  var floor_to = 6;
+ 
+  var socket = io();
+ 
+/* СОБЫТИЯ СОКЕТА */
+ socket.on('connect', function() {
+
+				$('#infoBlock').append("<span>Успешное подключение к сокету</span><br />");
+
+			
+			});
+
+ socket.on('other_client_connect', function(msg) {
+			
+			$('#current_floor').text(msg.floor_current);
+			$('#infoBlock').append("<span>" + msg.client + " подключился</span><br />");
+			$('#lift_state').text(getState(msg.state));
+			
+			});
+
+ socket.on('disconnect', function(msg) {
+			
+		$('#infoBlock').append("<span>Разрыв соединения</span><br />");
+				  
+    });
+	
+	
+socket.on('other_client_disconnect', function(msg) { 
+
+			$('#current_floor').text(msg.floor_current);
+			$('#infoBlock').append("<span>" + msg.client + " отключился</span><br />");
+	    });
+ 
+ socket.on('response', function(msg) {
+			
+			switch (msg.errno){
+			
+				case 0: $('#infoBlock').append("<span>" + msg.client.login + " подключен. " + "Этаж клиента: " + (msg.client.floor_dest + 1) + " Этаж назначения: " + (msg.client.floor_to + 1) + "</span><br />"); break;
+				case 1: $('#errorTxt').text("Ожидайте"); 
+						$('#send_btn').prop('disabled', false); break;
+				
+				case 3: $('#errorTxt').text("Ожидайте"); 
+						$('#send_btn').prop('disabled', false);break;
+			
+			}
+			 			  
+    });
+	
+socket.on('lift_response', function(msg) { // Получаем данные от сокета
+		
+		$('#current_floor').text(msg.floor_current);
+	
+		$('#lift_state').text(getState(msg.state));
+		
+		switch (msg.code){
+		
+			case 0: $('#infoBlock').append("<span>Лифт ожидает</span><br />");break;
+			case 1: $('#infoBlock').append("<span>Лифт остановлен</span><br />"); 
+					$('#send_btn').prop('disabled', false);break;
+			case 2: 
+			if(msg.reached_dest_floor == -1){
+				$('#infoBlock').append("<span>Лифт на этаже № " + msg.floor_current + "</span><br />"); break;
+			}else{
+			$('#infoBlock').append("<span>Клиент достиг этаж № " + msg.reached_dest_floor + "</span><br />"); break;
+			}
+					
+		}
+					  
+    });
+
+/* СОБЫТИЯ НАЖАТИЙ ПОЛЬЗОВАТЕЛЯ */
+$("#select_floor_dest").on("change", function() {
+
+	floor_dest = this.querySelectorAll('option')[this.selectedIndex].getAttribute('value');
+
+});
+
+$("#select_floor_to").on("change", function() {
+
+	floor_to = this.querySelectorAll('option')[this.selectedIndex].getAttribute('value');
+
+});
+
+$("#send_btn").on("click", function() { // Посылаем данные в сокет
+
+$(this).prop('disabled', true)
+$('#errorTxt').text("");
+	floor_dest = parseInt(floor_dest);
+	floor_to = parseInt(floor_to);
+	
+	if(floor_dest == floor_to){
+	
+		$('#errorTxt').text("Номера этажей совпадают");
+		$('#send_btn').prop('disabled', false);
+		return;
+	
+	}
+	
+	 let data = {login:"{{login}}",
+				floor_to:floor_to,
+				floor_dest:floor_dest
+				};
+	
+	socket.emit('request', data);
+
+});
+
+$("#unloginA").on("click", function() { // Разлогинимся
+
+	document.cookie = "user={{login}}" + ";expires=Thu, 01 Jan 1970 00:00:01 GMT";
+	window.location.replace("/auth");
+
+})
+
+$("#clear_btn").on("click", function() { // Посылаем данные в сокет
+
+	$('#errorTxt').text("");
+	
+	$('#infoBlock').empty();
+	
+})	
+
+function getState(state){
+
+	let msgTXT = ""
+
+		switch (state){
+		
+			case 0: msgTXT = "NEUTRAL";   break;
+			case 1: msgTXT = "GOING_DOWN"; break;
+			case 2: msgTXT = "GOING_UP";  break;
+		
+		}
+
+	return msgTXT;
+
+}
+
+}) // $(document).ready
+</script>
+
+</head>
+	<body>
+	  
+	<!-- !PAGE CONTENT! -->
+	<div class="w3-main w3-content w3-padding" style="max-width:1200px;margin-top:100px">
+	
+	<div class="w3-container">
+		<div class="w3-display-container">
+		<div class="w3-display-topleft">	
+			<a id = "unloginA" style="text-decoration:underline;cursor:pointer;">Разлогиниться</a></div>
+		<div class="w3-display-topright">
+    
+		{% if login == "admin" %} 
+			<a id = "usersA" href = "/users" style = "text-align:left" target = "_blank">Пользователи</a>
+			<a id = "logsA" href = "/logs" style = "text-align:right" target = "_blank">Логи</a>
+		{% endif %}
+				
+		</div>
+	</div>
+	
+	  <!-- Form-->
+	  <div class="w3-row w3-center w3-padding w3-border w3-border-blue w3-round-xlarge">
+		  <h3>{{login}}</h3>
+		  <h1>Лифт</h1>
+	<div class = "w3-container w3-margin">    
+		
+		<div class="w3-container">
+
+				<h4>Лифт на этаже № <span id = "current_floor"></span></h2>
+				<span>Состояние: <span id="lift_state">UNKNOWN</span></span><br />
+				<h2>На каком вы этаже?</h2>
+					<select class="w3-select" id="select_floor_dest">
+						<option value="0" class = "w3-center">1</option>
+						<option value="1" class = "w3-center">2</option>
+						<option value="2" class = "w3-center">3</option>
+						<option value="3" class = "w3-center">4</option>
+						<option value="4" class = "w3-center">5</option>
+						<option value="5" class = "w3-center">6</option>
+						<option value="6" class = "w3-center" selected>7</option>
+						<option value="7" class = "w3-center">8</option>
+						<option value="8" class = "w3-center">9</option>
+					</select>
+							<h2>На какой этаж ехать?</h2>
+						<select class="w3-select" id="select_floor_to">
+						<option value="0" class = "w3-center">1</option>
+						<option value="1" class = "w3-center">2</option>
+						<option value="2" class = "w3-center">3</option>
+						<option value="3" class = "w3-center">4</option>
+						<option value="4" class = "w3-center">5</option>
+						<option value="5" class = "w3-center">6</option>
+						<option value="6" class = "w3-center" selected>7</option>
+						<option value="7" class = "w3-center">8</option>
+						<option value="8" class = "w3-center">9</option>
+					</select>
+				
+										
+		</div>
+		
+	</div>
+		
+		<div class="w3-display-container" style = "margin:30px">
+		<div class = "w3-display-middle" id = "send_btn">
+		
+			<button class="w3-btn w3-green w3-hover-blue w3-round">OK</button>
+				
+		</div>
+		
+		<div class = "w3-display-left" id = "clear_btn">
+		
+			<button class="w3-btn w3-green w3-hover-blue w3-round">Oчистить</button>
+				
+		</div>
+		
+		</div>
+		
+		<div class = "w3-container" style="margin-top:60px;margin-bottom:0px">
+			<span id="errorTxt"></span>
+		</div>
+				
+		</div>
+		
+<div class="w3-row w3-center">	
+		<div class="w3-container" id = "infoBlock"></div>
+</div>
+		
+	 </div>
+	<!-- End page content -->
+
+	</body>
+</html>

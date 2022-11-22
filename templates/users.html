@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Пользователи</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="{{ url_for('static', filename= 'css/w3.css') }}" />
+<link rel="stylesheet" href="{{ url_for('static', filename= 'css/fonts/fonts.css') }}" />
+<script src="{{ url_for('static', filename= 'js/jquery.js') }}"></script>
+<script src="{{ url_for('static', filename= 'js/clear_logs.js') }}"></script>
+<style>
+body,h1,h2,h3,h4,h5,h6 {font-family: "Karma", sans-serif}
+.w3-bar-block .w3-bar-item {padding:20px}
+
+#send_btn{
+	display:inline-block;
+
+}
+</style>
+
+</head>
+<body>
+  
+<!-- !PAGE CONTENT! -->
+<div class="w3-main w3-content w3-padding" style="max-width:1200px;margin-top:100px">
+
+<a href="javascript:window.location.replace('/index')">Лифт</a>
+
+<h3 style = "text-align:center">Пользователи</h3>
+	
+	<hr />
+	
+	<div id = "logsBlock" style = "text-align:center;">
+	
+	{% if users %}
+	
+		{% for user in users %}
+
+		<span>{{ user }}</span></br>
+		{% endfor %}
+	
+	{% else %}
+	
+	<span>Нет записей</span>
+	
+	{% endif %}
+	</div>
+			
+	</div>
+ 
+<!-- End page content -->
+</div>
+
+</body>
+</html>

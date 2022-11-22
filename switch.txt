@@ -1,0 +1,9 @@
+cd C:\Users\DNS\Desktop\flask_app
+env\Scripts\activate
+setx FLASK_APP index
+setx FLASK_ENV development
+flask run
+
+cd %PYTHONPATH%
+env\Scripts\activate
+flask run
