@@ -44,9 +44,9 @@ def rega_admin():
 def rega_h():
     errors = list()
     login = request.json['login'].strip()
-    if login.lower() == "admin":
-        errors.append(2)
-        return json.dumps({'errors': errors, 'login': login})
+    #if login.lower() == "admin":
+        #errors.append(2)
+        #return json.dumps({'errors': errors, 'login': login})
 
     password = request.json['pass'].strip()
     pass_repeat = request.json['pass_repeat'].strip()
